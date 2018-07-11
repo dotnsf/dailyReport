@@ -1,0 +1,52 @@
+<html>
+<head>
+<title>ログイン</title>
+<meta charset="utf-8"/>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+
+<script src="//code.jquery.com/jquery-2.1.4.min.js"></script>
+<script type="text/javascript">
+$(function(){
+  /*
+  $('#login').submit( function() {
+    var user_id = $('#user_id').val();
+    var password = $('#password').val();
+    console.log( 'user_id=' + user_id + ', password=' + password );
+    $.ajax({
+      url: '/login',
+      method: 'POST',
+      //contentType: 'application/json',
+      data: { user_id: user_id, password: password },
+      success: function( data ){
+        console.log( data );
+        //. location.href = '/reports.html';
+      },
+      error: function( xhr, errorStatus, errorText ){
+        console.log( errorStatus + ': ' + errorText );
+      }
+    });
+    return false;
+  });
+  */
+});
+</script>
+<style>
+</style>
+</head>
+<body>
+<form method="POST" action="/login" id="login">
+<table>
+<tr>
+<td>ユーザーID</td><td><input type="text" name="user_id" id="user_id" value=""/></td>
+</tr>
+<tr>
+<td>パスワード</td><td><input type="password" name="password" id="password" value=""/></td>
+</tr>
+<tr>
+<td>&nbsp;</td><td><input type="submit" value="ログイン"/></td>
+</tr>
+</table>
+</form>
+</body>
+
+</html>

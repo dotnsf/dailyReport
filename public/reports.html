@@ -1,0 +1,49 @@
+<html>
+<head>
+<title>日報一覧</title>
+<meta charset="utf-8"/>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+
+<script src="//code.jquery.com/jquery-2.1.4.min.js"></script>
+<script type="text/javascript">
+var user_id = null;
+$(function(){
+  //. URL パラメータからユーザーIDを取得
+  if( location.search ){
+    var param_pairs = location.search.substring( 1 ).split( '&' );
+    param_pairs.forEach( function( param_pair ){
+      var params = param_pair.split( '=' );
+      if( params.length > 1 && params[0].toLowerCase() == 'user_id' ){
+        user_id = params[1];
+      }
+    });
+    if( user_id ){
+    }
+  }
+  
+  var url = '/reports';
+  if( user_id ){
+    url += '?user_id=' + user_id;
+  }
+  $.ajax({
+    url: url,
+    method: 'GET',
+    success: function( data ){
+      console.log( data );
+    },
+    error: function( xhr, errorStatus, errorText ){
+      console.log( errorStatus + ': ' + errorText );
+    }
+  });
+});
+</script>
+<style>
+</style>
+</head>
+<body>
+<h1>日報</h1>
+<ul id="reports">
+</ul>
+</body>
+
+</html>

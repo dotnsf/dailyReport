@@ -1,0 +1,16 @@
+{
+  "name": "dailyreport",
+  "version": "0.0.1",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "body-parser": "~1.18.x",
+    "express": "4.1.x",
+    "cfenv": "~1.0.0"
+  },
+  "repository": {},
+  "engines": {
+    "node": "4.x"
+  }
+}
