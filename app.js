@@ -6,106 +6,108 @@ var settings = require( './settings' );
 
 var appEnv = cfenv.getAppEnv();
 
-var reports = [];  //. “ú•ñˆê——
+var reports = [];  //. Reports
 
-//. Ã“I‚È HTML ‚ÌƒtƒHƒ‹ƒ_
+//. ï¿½Ã“Iï¿½ï¿½ HTML ï¿½Ìƒtï¿½Hï¿½ï¿½ï¿½_
 app.use( express.static( __dirname + '/public' ) );
 
-//. POST ƒŠƒNƒGƒXƒg‚Ö‚Ì‘Î‰
+//. POST ï¿½ï¿½ï¿½Nï¿½Gï¿½Xï¿½gï¿½Ö‚Ì‘Î‰ï¿½
 app.use( bodyParser.urlencoded( { extended: true, limit: '10mb' } ) );
 app.use( bodyParser.json() );
 
-//. ƒƒOƒCƒ“(POST /login)
+//. Login(POST /login)
 app.post( '/login', function( req, res ){
-  res.contentType( 'application/json' );  //. Œ‹‰Ê‚ğ JSON ƒtƒH[ƒ}ƒbƒg‚Å•Ô‚·
+  res.contentType( 'application/json' );  //. Result's content type
 
-  //. “ü—Í‚³‚ê‚½ id ‚ÆƒpƒXƒ[ƒh
+  //. Retrieve parameters
   var user_id = req.body.user_id;
   var password = req.body.password;
-  
-  //. ƒƒOƒCƒ“‰Â”Û‚ğ”»’f
-  //. @–{—ˆ‚ÍĞ“àƒ†[ƒU[î•ñ‚È‚Ç‚Æ˜AŒg‚µ‚Ä”»’f‚·‚é
-  //. @‚±‚ÌÀ‘•‚Å‚Í user_id ‚É‰½‚©’l‚ªŠÜ‚Ü‚ê‚Ä‚¢‚ÄAuser_id == password ‚Å‚ ‚ê‚Î¬Œ÷‚Æ‚·‚é
+
+  //. Login judgement
+  //.  Usually we use LDAP or other directory system for this judgement.
+  //.  In this implementation, it would be OK if (1)user_id is defined, and (2)user_id == password
   if( user_id && user_id == password ){
-    //. ƒƒOƒCƒ“¬Œ÷
+    //. OK
     res.write( JSON.stringify( { status: true, user_id: user_id, message: 'login succeeded.' }, null, 2 ) );
     res.end();
   }else{
-    //. ƒƒOƒCƒ“¸”s
+    //. Not valid
     res.status( 400 );
     res.write( JSON.stringify( { status: false, message: 'login failed.' }, null, 2 ) );
     res.end();
   }
 });
 
-//. “ú•ñ‚ğ•Û‘¶(POST /report)
+//. Create new report(POST /report)
 app.post( '/report', function( req, res ){
-  res.contentType( 'application/json' );  //. Œ‹‰Ê‚ğ JSON ƒtƒH[ƒ}ƒbƒg‚Å•Ô‚·
-  
-  //. ‘—M“à—e
+  res.contentType( 'application/json' );  //. Result's content type
+
+  //. Retrieve parameters
   var report = req.body;
-  
-  //. ƒoƒŠƒf[ƒVƒ‡ƒ“
+
+  //. Report needs to contain body, user_id, and date
   if( report.body && report.user_id && report.date ){
-    var id = ( new Date() ).getTime();  //. b’è“I‚Éƒ^ƒCƒ€ƒXƒ^ƒ“ƒv‚ğ“ú•ñ id ‚Æ‚·‚é
+    var id = ( new Date() ).getTime();  //. Generate report_id from timestamp
     report.id = id;
-    
+
     reports.push( report );
     res.write( JSON.stringify( { status: true, id: id }, 2, null ) );
     res.end();
   }else{
-    //. •Û‘¶¸”s
+    //. Not valid
     res.status( 400 );
     res.write( JSON.stringify( { status: false, message: 'not validated.' }, null, 2 ) );
     res.end();
   }
 });
 
-//. “ú•ñˆê——‚ğæ“¾‚·‚é(GET /reports)
+//. Get all reports for specific user(GET /reports)
 app.get( '/reports', function( req, res ){
-  res.contentType( 'application/json' );  //. Œ‹‰Ê‚ğ JSON ƒtƒH[ƒ}ƒbƒg‚Å•Ô‚·
-  
+  res.contentType( 'application/json' );  //. Result's content type
+
+  //. Retrieve parameters
   var user_id = req.query.user_id;
-  
+
   if( !user_id ){
-    //. user_id ƒpƒ‰ƒ[ƒ^‚ªw’è‚³‚ê‚Ä‚È‚©‚Á‚½
+    //. user_id is required parameter, but not set
     res.status( 400 );
     res.write( JSON.stringify( { status: false, message: 'parameter user_id required.' }, null, 2 ) );
     res.end();
   }else{
-    //. user_id ƒpƒ‰ƒ[ƒ^‚ªˆê’v‚·‚é‚à‚Ì‚¾‚¯‚ğæ‚èo‚·
+    //. Retrieve reports based on user_id
     var user_reports = [];
     reports.forEach( function( report ){
       if( report.user_id == user_id ){
         user_reports.push( report );
       }
     });
-    
+
     res.write( JSON.stringify( { status: true, reports: user_reports }, null, 2 ) );
     res.end();
   }
 });
 
-//. “Á’è ID ‚Ì“ú•ñ‚ğæ“¾‚·‚é(GET /report/:id)
+//. Retrieve one report with specific id(GET /report/:id)
 app.get( '/report/:id', function( req, res ){
-  res.contentType( 'application/json' );  //. Œ‹‰Ê‚ğ JSON ƒtƒH[ƒ}ƒbƒg‚Å•Ô‚·
-  
+  res.contentType( 'application/json' );  //. Result's content type
+
+  //. Retrieve parameters
   var id = req.params.id;
-  
+
   if( !id ){
-    //. id ƒpƒ‰ƒ[ƒ^‚ªw’è‚³‚ê‚Ä‚È‚©‚Á‚½
+    //. id is required parameter, but not set
     res.status( 400 );
     res.write( JSON.stringify( { status: false, message: 'access with id . GET /report/:id' }, null, 2 ) );
     res.end();
   }else{
-    //. id ƒpƒ‰ƒ[ƒ^‚ªˆê’v‚·‚é‚à‚Ì‚¾‚¯‚ğæ‚èo‚·
+    //. Retrieve report based on id 
     var user_report = null;
     reports.forEach( function( report ){
       if( report.id == id ){
         user_report = report;
       }
     });
-    
+
     if( user_report ){
       res.write( JSON.stringify( { status: true, reports: user_reports }, null, 2 ) );
       res.end();
@@ -120,5 +122,3 @@ app.get( '/report/:id', function( req, res ){
 
 app.listen( appEnv.port );
 console.log( "server starting on " + appEnv.port + " ..." );
-
-

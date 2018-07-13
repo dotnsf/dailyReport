@@ -20,20 +20,36 @@ $(function(){
     if( user_id ){
     }
   }
-  
-  var url = '/reports';
+
   if( user_id ){
-    url += '?user_id=' + user_id;
+    var url += '/reports?user_id=' + user_id;
+    $.ajax({
+      url: url,
+      method: 'GET',
+      success: function( data ){
+        console.log( data );
+      },
+      error: function( xhr, errorStatus, errorText ){
+        console.log( errorStatus + ': ' + errorText );
+      }
+    });
   }
-  $.ajax({
-    url: url,
-    method: 'GET',
-    success: function( data ){
-      console.log( data );
-    },
-    error: function( xhr, errorStatus, errorText ){
-      console.log( errorStatus + ': ' + errorText );
-    }
+
+  $('#newform').submit( function(){
+    var data = { body: $('#body').text(), user_id: $('#user_id').val(), date: new Date() };
+    console.log( data );
+    $.ajax({
+      url: '/report',
+      method: 'POST',
+      data; data,
+      success: function( result ){
+        console.log( result );
+      },
+      error: function( xhr, errorStatus, errorText ){
+        console.log( errorStatus + ': ' + errorText );
+      }
+    });
+    return false;
   });
 });
 </script>
@@ -44,6 +60,15 @@ $(function(){
 <h1>日報</h1>
 <ul id="reports">
 </ul>
+
+<hr/>
+
+<form id="newform">
+<input type="hidden" id="user_id" value=""/>
+<textarea id="body"></textarea>
+<input type="submit" value="Add Report"/>
+</form>
+
 </body>
 
 </html>
